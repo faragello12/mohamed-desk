@@ -1,0 +1,1154 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>مكتب محمد</title>
+<meta name="theme-color" content="#0D7A64">
+<meta name="robots" content="noindex, nofollow">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Readex+Pro:wght@500;600;700&display=swap">
+<style>
+  /* Layout: a work day read top-down. Sticky header (date + "now"), a capture bar that is always there,
+     then one view at a time: today's timeline, the week, clients, brain dump, schedule & settings. */
+  :root {
+    --bg: #F2F4F6; --surface: #FFFFFF; --sunk: #E9EDF1; --ink: #141920; --muted: #5A6472; --line: #DCE1E7;
+    --accent: #0D7A64; --accent-ink: #FFFFFF; --accent-soft: #DCF0EA;
+    --late: #C0410E; --late-soft: #FCE8DC; --warn: #9A5E06; --warn-soft: #FAEFD2; --done: #1B7F42;
+    --c1: #0D7A64; --c2: #2D59CF; --c3: #B3461E; --c4: #8649BC; --c5: #A97700; --c6: #C93F75; --c7: #3D7A2C; --c8: #4B5563;
+    --f-display: "Readex Pro", "IBM Plex Sans Arabic", Tahoma, sans-serif;
+    --f-body: "IBM Plex Sans Arabic", "Segoe UI", Tahoma, sans-serif;
+    --r: 10px;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0E1115; --surface: #161A20; --sunk: #1D232B; --ink: #E8ECF1; --muted: #97A1AF; --line: #28303A;
+      --accent: #3BC3A3; --accent-ink: #052019; --accent-soft: #12342C;
+      --late: #F2895A; --late-soft: #3A1E12; --warn: #E7B44A; --warn-soft: #33280E; --done: #5CCF8A;
+      --c1: #3BC3A3; --c2: #7F9EF5; --c3: #F08A5D; --c4: #C08CF0; --c5: #E7B44A; --c6: #F17BAA; --c7: #85C96E; --c8: #A3ADBB;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0E1115; --surface: #161A20; --sunk: #1D232B; --ink: #E8ECF1; --muted: #97A1AF; --line: #28303A;
+    --accent: #3BC3A3; --accent-ink: #052019; --accent-soft: #12342C;
+    --late: #F2895A; --late-soft: #3A1E12; --warn: #E7B44A; --warn-soft: #33280E; --done: #5CCF8A;
+    --c1: #3BC3A3; --c2: #7F9EF5; --c3: #F08A5D; --c4: #C08CF0; --c5: #E7B44A; --c6: #F17BAA; --c7: #85C96E; --c8: #A3ADBB;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.6 var(--f-body); direction: rtl; padding-bottom: env(safe-area-inset-bottom, 0px); }
+  img { max-width: 100%; }
+  button, input, select, textarea { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+  header.top { position: sticky; top: 0; z-index: 5; background: var(--surface); border-bottom: 1px solid var(--line); padding-top: env(safe-area-inset-top, 0px); }
+  .top-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 12px 8px; flex-wrap: wrap; }
+  .brand { font-size: 12px; color: var(--muted); letter-spacing: .02em; }
+  .date { font-family: var(--f-display); font-size: 20px; font-weight: 600; margin: 0; text-wrap: balance; }
+  .top-right { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .now { display: flex; align-items: center; gap: 8px; background: var(--accent-soft); color: var(--accent); border-radius: 999px; padding: 4px 12px; font-size: 13px; font-weight: 600; min-width: 0; }
+  .now .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex: none; }
+  @media (prefers-reduced-motion: no-preference) { .now .dot { animation: pulse 2s ease-in-out infinite; } }
+  @keyframes pulse { 50% { opacity: .35; } }
+  .sync { font-size: 12px; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; white-space: nowrap; }
+  .sync.ok { color: var(--done); }
+  .sync.bad { color: var(--late); border-color: var(--late); }
+  nav.tabs { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; }
+  nav.tabs a { padding: 8px 12px; color: var(--muted); text-decoration: none; border-bottom: 2px solid transparent; white-space: nowrap; font-weight: 500; }
+  nav.tabs a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--accent); }
+  nav.tabs .count { font-size: 12px; background: var(--sunk); border-radius: 999px; padding: 0 7px; margin-inline-start: 4px; color: var(--muted); }
+
+  .capture { display: grid; grid-template-columns: 1fr auto; gap: 8px; margin-block: 16px 4px; }
+  .capture .main { display: flex; gap: 8px; }
+  .capture input[type=text] { flex: 1; min-width: 0; }
+  .capture .opts { grid-column: 1 / -1; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .field, .capture input[type=text] { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; min-width: 0; }
+  select.field { padding-inline-end: 6px; }
+  .chk { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: var(--muted); cursor: pointer; }
+  .btn { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 7px 14px; font-weight: 500; }
+  .btn:hover { background: var(--sunk); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  .btn.primary:hover { filter: brightness(1.05); }
+  .btn.small { padding: 3px 10px; font-size: 13px; }
+  .btn.ghost { border-color: transparent; background: transparent; color: var(--muted); }
+  .btn.ghost:hover { background: var(--sunk); color: var(--ink); }
+  .btn.danger { color: var(--late); }
+  .btn:disabled { opacity: .6; cursor: default; }
+
+  .note { margin-block: 12px; padding: 10px 14px; border-radius: var(--r); background: var(--warn-soft); color: var(--warn); font-size: 14px; }
+  .auth { margin-block: 12px; padding: 12px 14px; border-radius: var(--r); background: var(--surface); border: 1px solid var(--accent); display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .auth b { flex: 1 1 100%; font-weight: 600; }
+  .auth input { flex: 1 1 180px; }
+  .auth .err { flex: 1 1 100%; color: var(--late); font-size: 13px; }
+  main { padding-block: 8px 64px; }
+  h2 { font-family: var(--f-display); font-size: 17px; font-weight: 600; margin: 0; }
+  .sec-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-block: 22px 10px; flex-wrap: wrap; }
+  .sec-head .sub { color: var(--muted); font-size: 13px; }
+  .muted { color: var(--muted); }
+
+  /* today */
+  .summary { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-top: 14px; }
+  .bar { flex: 1; min-width: 160px; height: 8px; background: var(--sunk); border-radius: 999px; overflow: hidden; }
+  .bar > i { display: block; height: 100%; background: var(--accent); border-radius: inherit; transition: width .3s; }
+  .summary .nums { font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .summary .nums b { color: var(--ink); font-weight: 600; }
+  .today-grid { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 24px; align-items: start; }
+  @media (max-width: 820px) { .today-grid { grid-template-columns: minmax(0, 1fr); } }
+  .welcome { margin-top: 16px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+  .welcome .row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .block { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 12px; padding-block: 12px; border-top: 1px solid var(--line); }
+  .block:first-child { border-top: 0; }
+  .block .time { font-variant-numeric: tabular-nums; font-size: 13px; color: var(--muted); padding-top: 2px; line-height: 1.4; }
+  .block .time b { display: block; color: var(--ink); font-weight: 600; font-size: 14px; }
+  .block .label { font-family: var(--f-display); font-weight: 600; font-size: 15px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .block .hint { color: var(--muted); font-size: 13px; margin-top: 1px; }
+  .block.past .label, .block.past .time b { color: var(--muted); }
+  .block.current { background: var(--accent-soft); border-radius: var(--r); padding-inline: 10px; border-top-color: transparent; }
+  .block.current + .block { border-top-color: transparent; }
+  .tag-now { font-family: var(--f-body); font-size: 11px; font-weight: 600; background: var(--accent); color: var(--accent-ink); border-radius: 999px; padding: 1px 8px; }
+  .items { display: flex; flex-direction: column; gap: 2px; margin-top: 6px; }
+  .empty-block { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+  .item { display: flex; align-items: flex-start; gap: 10px; padding: 6px 4px; border-radius: 8px; }
+  .item:hover { background: var(--sunk); }
+  .block.current .item:hover { background: var(--surface); }
+  .tick { flex: none; width: 20px; height: 20px; margin-top: 2px; border-radius: 6px; border: 1.5px solid var(--muted); background: transparent; display: grid; place-items: center; padding: 0; }
+  .tick.round { border-radius: 50%; }
+  .tick svg { width: 12px; height: 12px; opacity: 0; }
+  .item.done .tick { background: var(--done); border-color: var(--done); }
+  .item.done .tick svg { opacity: 1; stroke: var(--surface); }
+  .item .body { flex: 1; min-width: 0; }
+  .item .title { overflow-wrap: anywhere; }
+  .item .title.link { cursor: pointer; }
+  .item.done .title { text-decoration: line-through; color: var(--muted); }
+  .item .meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
+  .item .acts { display: flex; gap: 2px; flex: none; }
+  .chip { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: var(--muted); }
+  .chip .sw { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+  .pill { font-size: 11.5px; border-radius: 999px; padding: 0 8px; background: var(--sunk); color: var(--muted); line-height: 1.7; }
+  .pill.late { background: var(--late-soft); color: var(--late); font-weight: 600; }
+  .pill.warn { background: var(--warn-soft); color: var(--warn); font-weight: 600; }
+  .pill.pri { background: var(--late-soft); color: var(--late); }
+  .pill.ok { background: var(--accent-soft); color: var(--accent); }
+
+  .side { display: flex; flex-direction: column; gap: 16px; }
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 12px 14px; }
+  .panel h2 { font-size: 15px; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+  .panel .count { font-family: var(--f-body); font-size: 12px; background: var(--sunk); border-radius: 999px; padding: 0 8px; color: var(--muted); font-weight: 500; }
+  .follow { padding-block: 8px; border-top: 1px solid var(--line); }
+  .follow:first-of-type { border-top: 0; }
+  .follow .name { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+  .follow .what { font-size: 13px; color: var(--muted); margin-top: 2px; overflow-wrap: anywhere; }
+  .follow .row { display: flex; gap: 6px; align-items: center; justify-content: space-between; margin-top: 6px; flex-wrap: wrap; }
+
+  /* week */
+  .week { display: flex; flex-direction: column; gap: 10px; }
+  .day { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 10px 14px; }
+  .day.is-today { border-color: var(--accent); }
+  .day.off { background: transparent; border-style: dashed; }
+  .day .dh { display: flex; align-items: baseline; gap: 10px; justify-content: space-between; flex-wrap: wrap; }
+  .day .dh b { font-family: var(--f-display); font-weight: 600; }
+  .day .routines { color: var(--muted); font-size: 13px; margin-top: 4px; overflow-wrap: anywhere; }
+
+  /* clients */
+  .clients { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 12px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+  .card .ch { display: flex; align-items: center; gap: 8px; }
+  .card .ch .sw { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+  .card .ch b { font-family: var(--f-display); font-weight: 600; font-size: 16px; flex: 1; min-width: 0; overflow-wrap: anywhere; }
+  .card .services { display: flex; flex-wrap: wrap; gap: 4px; }
+  .card .line { font-size: 13px; color: var(--muted); overflow-wrap: anywhere; }
+  .card .line b { color: var(--ink); font-weight: 500; }
+  .card .tasks { display: flex; flex-direction: column; border-top: 1px solid var(--line); padding-top: 6px; }
+  .card .foot { display: flex; gap: 6px; flex-wrap: wrap; margin-top: auto; padding-top: 4px; }
+  .kind-head { margin-block: 22px 10px; }
+
+  /* dump */
+  textarea.dump { width: 100%; min-height: 160px; resize: vertical; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 12px 14px; line-height: 1.8; }
+  .inbox-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; padding: 8px 4px; border-top: 1px solid var(--line); }
+  .inbox-row .t { flex: 1 1 220px; min-width: 0; overflow-wrap: anywhere; }
+  .inbox-row .ctl { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+
+  /* plan & settings */
+  .sched-row { display: grid; grid-template-columns: 96px 96px minmax(0, 1fr) minmax(0, 1.6fr) auto; gap: 6px; align-items: center; margin-bottom: 6px; }
+  @media (max-width: 720px) { .sched-row { grid-template-columns: 1fr 1fr; } .sched-row .wide { grid-column: 1 / -1; } }
+  .daychips { display: flex; gap: 4px; flex-wrap: wrap; }
+  .daychip { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 1px 10px; font-size: 13px; color: var(--muted); }
+  .daychip[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+  .routine { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding: 10px 0; border-top: 1px solid var(--line); }
+  .routine .t { flex: 1 1 200px; min-width: 0; overflow-wrap: anywhere; }
+  .settings { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+  .settings .panel { display: flex; flex-direction: column; gap: 8px; }
+  .settings .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .settings p { margin: 0; font-size: 13px; color: var(--muted); }
+
+  /* modal + toast */
+  .overlay { position: fixed; inset: 0; background: rgb(0 0 0 / .45); display: grid; place-items: center; z-index: 20; padding: max(16px, env(safe-area-inset-left, 0px)); }
+  .modal { background: var(--surface); border-radius: 14px; width: min(520px, 100%); max-height: 88vh; overflow: auto; padding: 18px; display: flex; flex-direction: column; gap: 10px; }
+  .modal h2 { margin-bottom: 4px; }
+  .modal label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--muted); }
+  .modal label > .field, .modal label > textarea { color: var(--ink); font-size: 15px; width: 100%; }
+  .modal textarea.field { min-height: 70px; resize: vertical; }
+  .modal .two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .modal .acts { display: flex; gap: 8px; justify-content: space-between; flex-wrap: wrap; margin-top: 6px; }
+  .toast { position: fixed; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); left: 50%; transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 8px 16px; border-radius: 999px; font-size: 14px; z-index: 30; max-width: calc(100% - 32px); }
+  .center-empty { text-align: center; color: var(--muted); padding: 32px 12px; }
+</style>
+<script src="config.js"></script>
+</head>
+<body>
+<div id="app">
+  <header class="top">
+    <div class="wrap">
+      <div class="top-row">
+        <div>
+          <div class="brand" id="brand">مكتب محمد</div>
+          <h1 class="date" id="date"></h1>
+        </div>
+        <div class="top-right">
+          <div class="now" id="now" hidden><span class="dot"></span><span id="now-text"></span></div>
+          <span class="sync" id="sync" hidden></span>
+        </div>
+      </div>
+      <nav class="tabs" id="tabs" aria-label="الأقسام"></nav>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <form class="auth" id="auth" hidden autocomplete="on">
+      <b>سجّل دخول عشان المكتب يتزامن بين الموبايل واللابتوب</b>
+      <input class="field" type="email" id="auth-email" placeholder="الإيميل" autocomplete="username" required>
+      <input class="field" type="password" id="auth-pass" placeholder="الباسورد" autocomplete="current-password" required>
+      <button class="btn primary" type="submit" id="auth-btn">دخول</button>
+      <span class="err" id="auth-err" hidden></span>
+    </form>
+    <form class="capture" id="capture" autocomplete="off">
+      <div class="main">
+        <input type="text" id="qa-title" placeholder="إيه اللي لازم يتعمل؟ اكتبه هنا قبل ما تنساه" aria-label="مهمة جديدة">
+      </div>
+      <button class="btn primary" type="submit">زوّد</button>
+      <div class="opts">
+        <select class="field" id="qa-client" aria-label="العميل"></select>
+        <select class="field" id="qa-when" aria-label="امتى">
+          <option value="today">النهارده</option>
+          <option value="tomorrow">بكرة</option>
+          <option value="none">من غير ميعاد</option>
+          <option value="date">يوم معيّن…</option>
+        </select>
+        <input class="field" type="date" id="qa-date" hidden aria-label="التاريخ">
+        <select class="field" id="qa-block" aria-label="البلوك"></select>
+        <label class="chk"><input type="checkbox" id="qa-pri"> مهم</label>
+      </div>
+    </form>
+    <div class="note" id="note" hidden></div>
+    <main id="view" aria-live="polite"></main>
+  </div>
+</div>
+<div class="overlay" id="overlay" hidden></div>
+<div class="toast" id="toast" hidden></div>
+<input type="file" id="import-file" accept=".json,application/json" hidden>
+
+<script>
+(function () {
+  'use strict';
+  // ---------- constants & helpers ----------
+  var DAYS = ['الأحد', 'الاتنين', 'التلات', 'الأربع', 'الخميس', 'الجمعة', 'السبت'];
+  var WEEK_ORDER = [6, 0, 1, 2, 3, 4, 5];
+  var KINDS = { retainer: 'شهري', project: 'مشروع', follow: 'متابعة' };
+  var KIND_HEAD = { retainer: 'عملاء شهريين', project: 'مشاريع شغالة', follow: 'بتابع معاهم' };
+  var COLORS = ['c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7', 'c8'];
+  var VIEWS = [
+    { id: 'today', label: 'النهارده' },
+    { id: 'week', label: 'الأسبوع' },
+    { id: 'clients', label: 'العملاء' },
+    { id: 'dump', label: 'فضّي دماغك' },
+    { id: 'plan', label: 'الجدول والإعدادات' }
+  ];
+  var DEFAULT_SCHEDULE = {
+    offDays: [5],
+    blocks: [
+      { id: 'b1', start: '10:00', end: '10:30', label: 'رسايل وترتيب اليوم', hint: 'رد على كل العملاء مرة واحدة، وبعدها اقفل الواتساب' },
+      { id: 'b2', start: '10:30', end: '13:00', label: 'شغل عميق', hint: 'حاجة واحدة كبيرة بس، والموبايل بعيد' },
+      { id: 'b3', start: '13:00', end: '14:00', label: 'بريك', hint: 'أكل وراحة، من غير شغل' },
+      { id: 'b4', start: '14:00', end: '16:00', label: 'محتوى', hint: 'تصميم وكتابة البوستات' },
+      { id: 'b5', start: '16:00', end: '17:00', label: 'إعلانات و Support', hint: 'شيك الإعلانات وطلبات العملاء' },
+      { id: 'b6', start: '17:00', end: '18:00', label: 'متابعات وتعديلات', hint: 'ابعت المتابعات وخلّص التعديلات الصغيرة' },
+      { id: 'b7', start: '21:00', end: '21:15', label: 'قفل اليوم', hint: 'علّم اللي خلص، وحط أهم 3 حاجات لبكرة' }
+    ]
+  };
+  var CHECK_SVG = '<svg viewBox="0 0 12 12" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg>';
+  var STORE_KEY = 'mohamed-desk-v1';
+  var SUPABASE_SRC = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js';
+
+  function pad(n) { return String(n).padStart(2, '0'); }
+  function ymd(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+  function parse(s) { var p = String(s).split('-').map(Number); return new Date(p[0], p[1] - 1, p[2]); }
+  function addDays(s, n) { var d = parse(s); d.setDate(d.getDate() + n); return ymd(d); }
+  function diff(a, b) { return Math.round((parse(b) - parse(a)) / 86400000); }
+  function toMin(t) { var p = String(t || '0:0').split(':').map(Number); return p[0] * 60 + (p[1] || 0); }
+  var TODAY = ymd(new Date());
+  var fmtDay;
+  try { fmtDay = new Intl.DateTimeFormat('ar-EG-u-nu-latn', { weekday: 'long', day: 'numeric', month: 'long' }); }
+  catch (e) { fmtDay = { format: function (d) { return d.toDateString(); } }; }
+  function daysWord(n) { return n === 2 ? 'يومين' : n <= 10 ? n + ' أيام' : n + ' يوم'; }
+  function rel(s) {
+    var n = diff(TODAY, s);
+    if (n === 0) return 'النهارده';
+    if (n === 1) return 'بكرة';
+    if (n === -1) return 'امبارح';
+    if (n < 0) return 'من ' + daysWord(-n);
+    return 'بعد ' + daysWord(n);
+  }
+  function uid(p) { return p + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+
+  function h(tag, props) {
+    var e = document.createElement(tag);
+    if (props) Object.keys(props).forEach(function (k) {
+      var v = props[k];
+      if (v == null || v === false) return;
+      if (k === 'class') e.className = v;
+      else if (k === 'text') e.textContent = v;
+      else if (k === 'html') e.innerHTML = v;
+      else if (k.slice(0, 2) === 'on') e.addEventListener(k.slice(2), v);
+      else if (k === 'value' || k === 'checked' || k === 'selected' || k === 'disabled') e[k] = v;
+      else e.setAttribute(k, v === true ? '' : v);
+    });
+    for (var i = 2; i < arguments.length; i++) append(e, arguments[i]);
+    return e;
+  }
+  function append(e, c) {
+    if (c == null || c === false) return;
+    if (Array.isArray(c)) { c.forEach(function (x) { append(e, x); }); return; }
+    e.append(c instanceof Node ? c : document.createTextNode(String(c)));
+  }
+  function $(id) { return document.getElementById(id); }
+
+  var toastTimer;
+  function toast(msg) {
+    var t = $('toast'); t.textContent = msg; t.hidden = false;
+    clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.hidden = true; }, 2600);
+  }
+  function note(msg) { var n = $('note'); if (msg) { n.textContent = msg; n.hidden = false; } else n.hidden = true; }
+
+  // ---------- storage: this browser, plus optional Supabase sync ----------
+  // Data shape: { collection: { id: doc } }. Every doc carries _t (last change, ms);
+  // deletes leave { _deleted: true, _t } so other devices learn about them.
+  var Store = (function () {
+    var data = {}, subs = [];
+    try { data = JSON.parse(localStorage.getItem(STORE_KEY) || '{}') || {}; } catch (e) { data = {}; }
+    if (typeof data !== 'object' || Array.isArray(data)) data = {};
+    function split(p) { var i = p.indexOf('/'); return [p.slice(0, i), p.slice(i + 1)]; }
+    function saveLocal() {
+      try { localStorage.setItem(STORE_KEY, JSON.stringify(data)); }
+      catch (e) { note('المتصفح مش راضي يحفظ. لو فاتح الصفحة في وضع التصفح الخفي افتحها عادي.'); }
+    }
+    function emit() { subs.slice().forEach(function (f) { f(); }); }
+    return {
+      get: function (p) { var s = split(p), d = data[s[0]] && data[s[0]][s[1]]; return d && !d._deleted ? d : null; },
+      list: function (c) {
+        var m = data[c] || {};
+        return Object.keys(m).filter(function (k) { return m[k] && !m[k]._deleted; }).map(function (k) { return [k, m[k]]; });
+      },
+      put: function (p, doc) { var s = split(p); (data[s[0]] = data[s[0]] || {})[s[1]] = doc; saveLocal(); emit(); Sync.dirty(); },
+      raw: function () { return data; },
+      mergeIn: function (other, stampMissing) {
+        var changed = false, now = Date.now();
+        if (!other || typeof other !== 'object' || Array.isArray(other)) return false;
+        Object.keys(other).forEach(function (c) {
+          var oc = other[c];
+          if (!oc || typeof oc !== 'object' || Array.isArray(oc)) return;
+          var mc = data[c] = data[c] || {};
+          Object.keys(oc).forEach(function (id) {
+            var o = oc[id];
+            if (!o || typeof o !== 'object' || Array.isArray(o)) return;
+            if (stampMissing && !o._t) o = Object.assign({}, o, { _t: now });
+            var m = mc[id];
+            if (!m || (Number(o._t) || 0) > (Number(m._t) || 0)) { mc[id] = o; changed = true; }
+          });
+        });
+        if (changed) { saveLocal(); emit(); }
+        return changed;
+      },
+      wipe: function () {
+        var now = Date.now();
+        Object.keys(data).forEach(function (c) { Object.keys(data[c]).forEach(function (id) { data[c][id] = { _deleted: true, _t: now }; }); });
+        saveLocal(); emit(); Sync.dirty();
+      },
+      prune: function () {
+        var cutoff = Date.now() - 60 * 86400000, oldDay = addDays(TODAY, -60);
+        Object.keys(data).forEach(function (c) {
+          Object.keys(data[c]).forEach(function (id) {
+            var d = data[c][id];
+            if (d && d._deleted && (Number(d._t) || 0) < cutoff) delete data[c][id];
+            else if (c === 'days' && id < oldDay) delete data[c][id];
+          });
+        });
+        saveLocal();
+      },
+      isEmpty: function () { var self = this; return !['clients', 'tasks', 'routines'].some(function (c) { return self.list(c).length; }); },
+      subscribe: function (f) { subs.push(f); return function () { subs = subs.filter(function (x) { return x !== f; }); }; }
+    };
+  })();
+
+  function strip(d) { if (!d) return undefined; var o = Object.assign({}, d); delete o._t; delete o._deleted; return o; }
+  // Same small surface the page uses everywhere: doc(path).set/update/delete/onSnapshot, collection(name).onSnapshot
+  var db = {
+    doc: function (path) {
+      return {
+        set: function (v) { Store.put(path, Object.assign({}, v, { _t: Date.now() })); return Promise.resolve(); },
+        update: function (v) { Store.put(path, Object.assign({}, Store.get(path) || {}, v, { _t: Date.now() })); return Promise.resolve(); },
+        delete: function () { Store.put(path, { _deleted: true, _t: Date.now() }); return Promise.resolve(); },
+        onSnapshot: function (next) {
+          var f = function () { var d = Store.get(path); next({ exists: !!d, data: function () { return strip(d); } }); };
+          f(); return Store.subscribe(f);
+        }
+      };
+    },
+    collection: function (name) {
+      return {
+        onSnapshot: function (next) {
+          var f = function () { next({ docs: Store.list(name).map(function (e) { return { id: e[0], data: function () { return strip(e[1]); } }; }) }); };
+          f(); return Store.subscribe(f);
+        }
+      };
+    }
+  };
+
+  var Sync = (function () {
+    var cfg = window.DESK_CONFIG || {}, sb = null, user = null, state = 'local', lastErr = '', timer = 0, busy = false, again = false;
+    function enabled() { return !!(cfg.supabaseUrl && cfg.supabaseAnonKey); }
+    function set(s, err) { state = s; lastErr = err || ''; renderSync(); }
+    function loadLib() {
+      return new Promise(function (res, rej) {
+        if (window.supabase && window.supabase.createClient) return res();
+        var s = document.createElement('script'); s.src = SUPABASE_SRC;
+        s.onload = function () { res(); }; s.onerror = function () { rej(new Error('مكتبة Supabase مااتحملتش. شيك على النت')); };
+        document.head.append(s);
+      });
+    }
+    async function fetchRemote() {
+      var r = await sb.from('desk_state').select('data').eq('user_id', user.id).maybeSingle();
+      if (r.error) throw r.error;
+      return r.data ? r.data.data : null;
+    }
+    async function pull() {
+      if (!sb || !user) return;
+      try { var remote = await fetchRemote(); if (remote) Store.mergeIn(remote); if (state !== 'saving') set('synced'); }
+      catch (e) { set('error', e.message); }
+    }
+    async function push() {
+      if (!sb || !user) return;
+      if (busy) { again = true; return; }
+      busy = true; set('saving');
+      try {
+        var remote = await fetchRemote();
+        if (remote) Store.mergeIn(remote);
+        Store.prune();
+        var r = await sb.from('desk_state').upsert({ user_id: user.id, data: Store.raw(), updated_at: new Date().toISOString() });
+        if (r.error) throw r.error;
+        set('synced');
+      } catch (e) { set('error', e.message); }
+      busy = false;
+      if (again) { again = false; push(); }
+    }
+    return {
+      enabled: enabled,
+      state: function () { return state; },
+      error: function () { return lastErr; },
+      email: function () { return user && user.email; },
+      init: async function () {
+        if (!enabled()) { set('local'); return; }
+        set('connecting');
+        try {
+          await loadLib();
+          sb = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey);
+          var r = await sb.auth.getSession();
+          if (r.data && r.data.session) { user = r.data.session.user; await pull(); await push(); }
+          else set('login');
+          sb.auth.onAuthStateChange(function (ev, session) { user = session ? session.user : null; if (!user && state !== 'local') set('login'); });
+          document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') pull(); });
+          setInterval(pull, 120000);
+        } catch (e) { set('error', e.message); }
+      },
+      dirty: function () { if (!sb || !user) return; clearTimeout(timer); timer = setTimeout(push, 1200); },
+      pushNow: function () { clearTimeout(timer); return push(); },
+      signIn: async function (email, pass) {
+        var r = await sb.auth.signInWithPassword({ email: email, password: pass });
+        if (r.error) throw r.error;
+        user = r.data.user; await pull(); await push();
+      },
+      signOut: async function () { if (sb) await sb.auth.signOut(); user = null; set('login'); }
+    };
+  })();
+
+  function renderSync() {
+    var el = $('sync'), st = Sync.state();
+    var map = { local: ['محفوظ على الجهاز ده', ''], connecting: ['بيتصل…', ''], login: ['مش مسجّل دخول', 'bad'], saving: ['بيحفظ…', ''], synced: ['متزامن ✓', 'ok'], error: ['المزامنة واقفة', 'bad'] };
+    var m = map[st] || map.local;
+    el.textContent = m[0]; el.className = 'sync' + (m[1] ? ' ' + m[1] : ''); el.hidden = false;
+    el.title = st === 'error' ? Sync.error() : '';
+    $('auth').hidden = st !== 'login';
+    if (view() === 'plan') changed();
+  }
+  $('auth').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var btn = $('auth-btn'), err = $('auth-err');
+    btn.disabled = true; err.hidden = true;
+    Sync.signIn($('auth-email').value.trim(), $('auth-pass').value).then(function () {
+      $('auth-pass').value = ''; toast('دخلت، والمكتب بقى متزامن');
+    }, function (x) {
+      err.textContent = /invalid/i.test(x && x.message) ? 'الإيميل أو الباسورد غلط' : 'مقدرتش أدخل: ' + (x && x.message || 'حصلت مشكلة');
+      err.hidden = false;
+    }).then(function () { btn.disabled = false; });
+  });
+
+  // ---------- state ----------
+  var S = { clients: [], tasks: [], routines: [], schedule: null, app: null, day: { routines: {} } };
+  function schedule() { return S.schedule && Array.isArray(S.schedule.blocks) ? S.schedule : DEFAULT_SCHEDULE; }
+  function blocks() { return schedule().blocks.slice().sort(function (a, b) { return toMin(a.start) - toMin(b.start); }); }
+  function isOff(dow) { return (schedule().offDays || []).indexOf(dow) >= 0; }
+  function appName() { return (S.app && S.app.name) || 'مكتب محمد'; }
+  function client(id) { for (var i = 0; i < S.clients.length; i++) if (S.clients[i].id === id) return S.clients[i]; return null; }
+  function activeClients() { return S.clients.filter(function (c) { return !c.archived; }); }
+  function routinesFor(dow) { return S.routines.filter(function (r) { return (r.days || []).indexOf(dow) >= 0; }).sort(function (a, b) { return (a.order || 0) - (b.order || 0); }); }
+
+  function followInfo(c) {
+    var every = Number(c.followEvery) || 0;
+    if (!every) return null;
+    if (!c.lastContact) return { due: TODAY, late: 0, never: true };
+    var due = addDays(c.lastContact, every);
+    return { due: due, late: diff(due, TODAY) };
+  }
+  function dueFollowups() {
+    return activeClients().map(function (c) { return { c: c, f: followInfo(c) }; })
+      .filter(function (x) { return x.f && x.f.late >= 0; })
+      .sort(function (a, b) { return b.f.late - a.f.late; });
+  }
+  function detectClient(text) {
+    var low = String(text).toLowerCase(), best = '';
+    activeClients().forEach(function (c) {
+      (c.keys || []).concat([c.name || '']).forEach(function (k) {
+        k = String(k).trim().toLowerCase();
+        if (k.length >= 3 && low.indexOf(k) >= 0 && !best) best = c.id;
+      });
+    });
+    return best;
+  }
+
+  function save(path, op) {
+    return Promise.resolve().then(function () { return op(db.doc(path)); }).then(function () { return true; }, function () { toast('ماتحفظش، جرّب تاني'); return false; });
+  }
+  var unsubDay = null;
+  function subDay() {
+    if (unsubDay) unsubDay();
+    unsubDay = db.doc('days/' + TODAY).onSnapshot(function (s) {
+      var d = s.exists ? s.data() : null;
+      S.day = { routines: Object.assign({}, d && d.routines) };
+      changed();
+    });
+  }
+  function start() {
+    function listen(name, apply) {
+      db.collection(name).onSnapshot(function (s) {
+        apply(s.docs.map(function (d) { return Object.assign({ id: d.id }, d.data()); }));
+        changed();
+      });
+    }
+    listen('clients', function (rows) { S.clients = rows.sort(function (a, b) { return (a.order || 99) - (b.order || 99); }); fillSelects(); });
+    listen('tasks', function (rows) { S.tasks = rows; });
+    listen('routines', function (rows) { S.routines = rows; });
+    db.doc('settings/schedule').onSnapshot(function (s) { S.schedule = s.exists ? s.data() : null; fillSelects(); changed(); });
+    db.doc('settings/app').onSnapshot(function (s) { S.app = s.exists ? s.data() : null; changed(); });
+    subDay();
+    Sync.init();
+  }
+
+  // ---------- actions ----------
+  function addTask(t) {
+    var id = uid('t');
+    var body = { title: t.title, client: t.client || '', due: t.due || '', block: t.block || '', pri: !!t.pri, done: false, doneAt: '', created: TODAY };
+    return save('tasks/' + id, function (r) { return r.set(body); });
+  }
+  function patchTask(t, patch) { Object.assign(t, patch); return save('tasks/' + t.id, function (r) { return r.update(patch); }); }
+  function toggleTask(t) { patchTask(t, { done: !t.done, doneAt: !t.done ? TODAY : '' }); }
+  function deleteTask(t) { save('tasks/' + t.id, function (r) { return r.delete(); }); }
+  function toggleRoutine(r) {
+    var next = Object.assign({}, S.day.routines); next[r.id] = !next[r.id];
+    save('days/' + TODAY, function (ref) { return ref.set({ routines: next }); });
+  }
+  function contacted(c) {
+    save('clients/' + c.id, function (r) { return r.update({ lastContact: TODAY }); }).then(function (ok) { if (ok) toast('اتسجّل إنك اتواصلت مع ' + c.name); });
+  }
+
+  // ---------- backup ----------
+  function exportData() {
+    var blob = new Blob([JSON.stringify(Store.raw(), null, 2)], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = h('a', { href: url, download: 'mohamed-desk-backup-' + TODAY + '.json' });
+    document.body.append(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+    toast('النسخة الاحتياطية نزلت');
+  }
+  function importData() { var f = $('import-file'); f.value = ''; f.click(); }
+  $('import-file').addEventListener('change', function () {
+    var file = this.files && this.files[0];
+    if (!file) return;
+    var rd = new FileReader();
+    rd.onload = function () {
+      try {
+        var obj = JSON.parse(String(rd.result));
+        var changed = Store.mergeIn(obj, true);
+        Sync.dirty();
+        toast(changed ? 'البيانات اتضافت' : 'مفيش حاجة جديدة في الملف ده');
+      } catch (e) { toast('الملف ده مش ملف بيانات المكتب'); }
+    };
+    rd.readAsText(file);
+  });
+
+  // ---------- capture bar ----------
+  function fillSelects() {
+    var cs = $('qa-client'), cur = cs.value;
+    cs.replaceChildren(h('option', { value: '' }, 'من غير عميل'));
+    activeClients().forEach(function (c) { cs.append(h('option', { value: c.id }, c.name)); });
+    cs.value = cur;
+    var bs = $('qa-block'), curb = bs.value;
+    bs.replaceChildren(h('option', { value: '' }, 'أي وقت'));
+    blocks().forEach(function (b) { bs.append(h('option', { value: b.id }, b.start + ' ' + b.label)); });
+    bs.value = curb;
+  }
+  $('qa-when').addEventListener('change', function () { $('qa-date').hidden = this.value !== 'date'; });
+  $('capture').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var title = $('qa-title').value.trim();
+    if (!title) { $('qa-title').focus(); return; }
+    var when = $('qa-when').value, due = '';
+    if (when === 'today') due = TODAY;
+    else if (when === 'tomorrow') due = addDays(TODAY, 1);
+    else if (when === 'date') due = $('qa-date').value || '';
+    var cl = $('qa-client').value || detectClient(title);
+    addTask({ title: title, client: cl, due: due, block: $('qa-block').value, pri: $('qa-pri').checked });
+    $('qa-title').value = ''; $('qa-pri').checked = false;
+    var c = client(cl);
+    toast('اتضافت' + (c ? ' لـ ' + c.name : '') + (due ? ' · ' + rel(due) : ' · في الصندوق'));
+  });
+
+  // ---------- shared pieces ----------
+  function clientChip(id) {
+    var c = client(id); if (!c) return null;
+    return h('span', { class: 'chip' }, h('span', { class: 'sw', style: 'background:var(--' + (c.color || 'c8') + ')' }), c.name);
+  }
+  function tick(done, round, onclick, label) {
+    return h('button', { class: 'tick' + (round ? ' round' : ''), type: 'button', html: CHECK_SVG, 'aria-pressed': done ? 'true' : 'false', 'aria-label': label, onclick: onclick });
+  }
+  function taskRow(t, opts) {
+    opts = opts || {};
+    var meta = [];
+    if (!opts.hideClient) meta.push(clientChip(t.client));
+    if (t.pri && !t.done) meta.push(h('span', { class: 'pill pri' }, 'مهم'));
+    if (!t.done && t.due && t.due < TODAY) meta.push(h('span', { class: 'pill late' }, 'متأخرة ' + rel(t.due).replace('من ', '')));
+    if (opts.showDue && t.due && t.due >= TODAY) meta.push(h('span', { class: 'pill' }, rel(t.due)));
+    var acts = [];
+    if (!t.done && !opts.noMove) acts.push(h('button', { class: 'btn ghost small', type: 'button', title: 'أجّلها لبكرة', onclick: function () { patchTask(t, { due: addDays(TODAY, 1) }); toast('اتأجلت لبكرة'); } }, 'بكرة'));
+    meta = meta.filter(Boolean);
+    return h('div', { class: 'item' + (t.done ? ' done' : '') },
+      tick(t.done, false, function () { toggleTask(t); }, t.done ? 'رجّعها مش خالصة' : 'خلصت'),
+      h('div', { class: 'body' },
+        h('div', { class: 'title link', role: 'button', tabindex: '0', onclick: function () { editTask(t); }, onkeydown: function (e) { if (e.key === 'Enter') editTask(t); } }, t.title),
+        meta.length ? h('div', { class: 'meta' }, meta) : null),
+      acts.length ? h('div', { class: 'acts' }, acts) : null);
+  }
+  function routineRow(r, done) {
+    return h('div', { class: 'item' + (done ? ' done' : '') },
+      tick(done, true, function () { toggleRoutine(r); }, done ? 'رجّعها' : 'خلصت'),
+      h('div', { class: 'body' }, h('div', { class: 'title' }, r.title),
+        h('div', { class: 'meta' }, clientChip(r.client), h('span', { class: 'pill' }, 'روتين'))));
+  }
+  function followRow(x) {
+    var c = x.c, f = x.f;
+    var state = f.never ? 'مش متسجل امتى آخر مرة' : f.late === 0 ? 'ميعادها النهارده' : 'متأخرة ' + daysWord(f.late);
+    return h('div', { class: 'follow' },
+      h('div', { class: 'name' }, h('span', { class: 'sw', style: 'width:9px;height:9px;border-radius:50%;background:var(--' + (c.color || 'c8') + ')' }), c.name),
+      c.nextAction ? h('div', { class: 'what' }, c.nextAction) : null,
+      h('div', { class: 'row' },
+        h('span', { class: 'pill ' + (f.late > 0 ? 'late' : 'warn') }, state),
+        h('button', { class: 'btn small', type: 'button', onclick: function () { contacted(c); } }, 'اتواصلت ✓')));
+  }
+
+  // ---------- views ----------
+  function nowState() {
+    var now = new Date(), m = now.getHours() * 60 + now.getMinutes();
+    if (isOff(parse(TODAY).getDay())) return { off: true, m: m };
+    var cur = null, next = null;
+    blocks().forEach(function (b) {
+      if (m >= toMin(b.start) && m < toMin(b.end)) cur = b;
+      else if (toMin(b.start) > m && !next) next = b;
+    });
+    return { cur: cur, next: next, m: m };
+  }
+  function renderHeader() {
+    $('brand').textContent = appName();
+    document.title = appName();
+    $('date').textContent = fmtDay.format(parse(TODAY));
+    var ns = nowState(), txt;
+    if (ns.off) txt = 'النهارده أجازة';
+    else if (ns.cur) txt = 'دلوقتي: ' + ns.cur.label + ' لحد ' + ns.cur.end;
+    else if (ns.next) txt = 'الجاي: ' + ns.next.label + ' الساعة ' + ns.next.start;
+    else txt = 'اليوم خلص';
+    $('now-text').textContent = txt; $('now').hidden = false;
+    var counts = { dump: S.tasks.filter(function (t) { return !t.done && !t.due; }).length };
+    var tabs = $('tabs'); tabs.replaceChildren();
+    VIEWS.forEach(function (v) {
+      tabs.append(h('a', { href: '#' + v.id, 'aria-current': v.id === view() ? 'page' : null }, v.label,
+        counts[v.id] ? h('span', { class: 'count' }, counts[v.id]) : null));
+    });
+  }
+
+  function welcome(root) {
+    root.append(h('div', { class: 'welcome' },
+      h('h2', null, 'أهلًا، المكتب فاضي لسه'),
+      h('div', { class: 'muted' }, 'لو معاك ملف بياناتك (my-data.json) استورده وهتلاقي عملاءك وروتينك جاهزين. أو ابدأ من الأول: زوّد عملاءك من "العملاء" والروتين من "الجدول والإعدادات".'),
+      h('div', { class: 'row' },
+        h('button', { class: 'btn primary', type: 'button', onclick: importData }, 'استورد ملف البيانات'),
+        h('a', { class: 'btn', href: '#clients' }, 'زوّد أول عميل'))));
+  }
+
+  function viewToday(root) {
+    if (Store.isEmpty()) welcome(root);
+    var dow = parse(TODAY).getDay();
+    var off = isOff(dow);
+    var rs = off ? [] : routinesFor(dow);
+    var open = S.tasks.filter(function (t) { return !t.done && t.due && t.due <= TODAY; });
+    var doneToday = S.tasks.filter(function (t) { return t.done && t.doneAt === TODAY; });
+    var rDone = rs.filter(function (r) { return S.day.routines[r.id]; }).length;
+    var total = rs.length + open.length + doneToday.length;
+    var done = rDone + doneToday.length;
+    var late = open.filter(function (t) { return t.due < TODAY; }).length;
+    var fol = dueFollowups();
+
+    root.append(h('div', { class: 'summary' },
+      h('div', { class: 'bar', role: 'progressbar', 'aria-valuemin': 0, 'aria-valuemax': total, 'aria-valuenow': done },
+        h('i', { style: 'width:' + (total ? Math.round(done / total * 100) : 0) + '%' })),
+      h('div', { class: 'nums' }, h('b', null, done + ' من ' + total), ' خلصوا',
+        late ? ' · ' : '', late ? h('b', { style: 'color:var(--late)' }, late + ' متأخرة') : null,
+        fol.length ? ' · ' + fol.length + ' متابعة' : '')));
+
+    var grid = h('div', { class: 'today-grid' });
+    var tl = h('div');
+    var ns = nowState();
+    var byBlock = {}, any = [];
+    var bs = blocks(), ids = bs.map(function (b) { return b.id; });
+    open.concat(doneToday).forEach(function (t) {
+      if (t.block && ids.indexOf(t.block) >= 0) (byBlock[t.block] = byBlock[t.block] || []).push(t); else any.push(t);
+    });
+    function sortTasks(a, b) { return (a.done - b.done) || (b.pri - a.pri) || String(a.due).localeCompare(String(b.due)); }
+
+    tl.append(h('div', { class: 'sec-head' }, h('h2', null, off ? 'النهارده أجازة' : 'يومك بالبلوكات'),
+      h('span', { class: 'sub' }, off ? 'لو فيه حاجة متأخرة هتلاقيها جنب' : 'كل بلوك فيه الروتين بتاعه والمهام اللي حطيتها فيه')));
+    if (!off) {
+      var list = h('div');
+      bs.forEach(function (b) {
+        var items = [];
+        rs.filter(function (r) { return r.block === b.id; }).forEach(function (r) { items.push(routineRow(r, !!S.day.routines[r.id])); });
+        (byBlock[b.id] || []).sort(sortTasks).forEach(function (t) { items.push(taskRow(t)); });
+        var isCur = ns.cur && ns.cur.id === b.id;
+        var past = !isCur && ns.m >= toMin(b.end);
+        list.append(h('div', { class: 'block' + (isCur ? ' current' : '') + (past ? ' past' : '') },
+          h('div', { class: 'time' }, h('b', null, b.start), b.end),
+          h('div', { style: 'min-width:0' },
+            h('div', { class: 'label' }, b.label, isCur ? h('span', { class: 'tag-now' }, 'دلوقتي') : null),
+            b.hint ? h('div', { class: 'hint' }, b.hint) : null,
+            items.length ? h('div', { class: 'items' }, items) : null)));
+      });
+      tl.append(list);
+    }
+
+    var side = h('div', { class: 'side' });
+    var stray = rs.filter(function (r) { return ids.indexOf(r.block) < 0; });
+    var anyPanel = h('div', { class: 'panel' }, h('h2', null, 'في أي وقت النهارده', h('span', { class: 'count' }, any.length + stray.length)));
+    stray.forEach(function (r) { anyPanel.append(routineRow(r, !!S.day.routines[r.id])); });
+    any.sort(sortTasks).forEach(function (t) { anyPanel.append(taskRow(t)); });
+    if (!any.length && !stray.length) anyPanel.append(h('div', { class: 'empty-block' }, 'مفيش. المهام اللي من غير بلوك بتظهر هنا.'));
+    side.append(anyPanel);
+
+    var fp = h('div', { class: 'panel' }, h('h2', null, 'عملاء محتاجين تكلمهم', h('span', { class: 'count' }, fol.length)));
+    if (fol.length) fol.forEach(function (x) { fp.append(followRow(x)); });
+    else fp.append(h('div', { class: 'empty-block' }, 'كله متابَع. لما عميل ييجي ميعاد متابعته هيظهر هنا.'));
+    side.append(fp);
+
+    var tomorrow = addDays(TODAY, 1);
+    var tmr = S.tasks.filter(function (t) { return !t.done && t.due === tomorrow; });
+    if (tmr.length) {
+      var tp = h('div', { class: 'panel' }, h('h2', null, 'بكرة', h('span', { class: 'count' }, tmr.length)));
+      tmr.forEach(function (t) { tp.append(taskRow(t, { noMove: true })); });
+      side.append(tp);
+    }
+    grid.append(tl, side);
+    root.append(grid);
+  }
+
+  function viewWeek(root) {
+    root.append(h('div', { class: 'sec-head' }, h('h2', null, 'الأسبوع الجاي'), h('span', { class: 'sub' }, 'الروتين متكرر، والمهام اللي ليها ميعاد')));
+    var wk = h('div', { class: 'week' });
+    for (var i = 0; i < 7; i++) {
+      var date = addDays(TODAY, i), dow = parse(date).getDay(), off = isOff(dow);
+      var ts = S.tasks.filter(function (t) { return t.due && (t.due === date || (i === 0 && t.due < TODAY && !t.done)) && (!t.done || t.doneAt === TODAY); });
+      var rs = off ? [] : routinesFor(dow);
+      var box = h('div', { class: 'day' + (i === 0 ? ' is-today' : '') + (off ? ' off' : '') },
+        h('div', { class: 'dh' }, h('b', null, (i === 0 ? 'النهارده · ' : i === 1 ? 'بكرة · ' : '') + fmtDay.format(parse(date))),
+          h('span', { class: 'muted', style: 'font-size:13px' }, off ? 'أجازة' : ts.filter(function (t) { return !t.done; }).length + ' مهمة · ' + rs.length + ' روتين')));
+      if (rs.length) box.append(h('div', { class: 'routines' }, 'روتين: ' + rs.map(function (r) { return r.title; }).join('، ')));
+      if (ts.length) {
+        var it = h('div', { class: 'items' });
+        ts.sort(function (a, b) { return (a.done - b.done) || (b.pri - a.pri); }).forEach(function (t) { it.append(taskRow(t, { noMove: i > 0 })); });
+        box.append(it);
+      }
+      wk.append(box);
+    }
+    root.append(wk);
+    var later = S.tasks.filter(function (t) { return !t.done && t.due && t.due > addDays(TODAY, 6); }).sort(function (a, b) { return a.due.localeCompare(b.due); });
+    if (later.length) {
+      root.append(h('div', { class: 'sec-head' }, h('h2', null, 'بعد كده'), h('span', { class: 'sub' }, later.length + ' مهمة')));
+      var l = h('div', { class: 'items' });
+      later.forEach(function (t) { l.append(taskRow(t, { showDue: true, noMove: true })); });
+      root.append(l);
+    }
+  }
+
+  function viewClients(root) {
+    root.append(h('div', { class: 'sec-head' }, h('h2', null, 'العملاء'),
+      h('button', { class: 'btn small', type: 'button', onclick: function () { editClient(null); } }, '+ عميل جديد')));
+    if (!activeClients().length) root.append(h('div', { class: 'center-empty' }, 'لسه مفيش عملاء. دوس "عميل جديد".'));
+    ['retainer', 'project', 'follow'].forEach(function (kind) {
+      var cs = activeClients().filter(function (c) { return (c.kind || 'project') === kind; });
+      if (!cs.length) return;
+      root.append(h('h2', { class: 'kind-head' }, KIND_HEAD[kind], ' ', h('span', { class: 'muted', style: 'font-size:13px;font-weight:400' }, '(' + cs.length + ')')));
+      var grid = h('div', { class: 'clients' });
+      cs.forEach(function (c) { grid.append(clientCard(c)); });
+      root.append(grid);
+    });
+    var arch = S.clients.filter(function (c) { return c.archived; });
+    if (arch.length) {
+      var box = h('div', { style: 'margin-top:24px;display:flex;gap:6px;flex-wrap:wrap;align-items:center' }, h('span', { class: 'muted', style: 'font-size:13px' }, 'مقفولين:'));
+      arch.forEach(function (c) {
+        box.append(h('button', { class: 'btn ghost small', type: 'button', title: 'رجّعه', onclick: function () {
+          save('clients/' + c.id, function (r) { return r.update({ archived: false }); }).then(function () { toast(c.name + ' رجع'); });
+        } }, c.name + ' ↩'));
+      });
+      root.append(box);
+    }
+  }
+  function clientCard(c) {
+    var f = followInfo(c);
+    var open = S.tasks.filter(function (t) { return t.client === c.id && !t.done; }).sort(function (a, b) { return (b.pri - a.pri) || String(a.due || '9').localeCompare(String(b.due || '9')); });
+    var fline = null;
+    if (f) {
+      var st = f.never ? h('span', { class: 'pill warn' }, 'تابع النهارده')
+        : f.late > 0 ? h('span', { class: 'pill late' }, 'متأخر ' + daysWord(f.late))
+        : f.late === 0 ? h('span', { class: 'pill warn' }, 'النهارده')
+        : h('span', { class: 'pill ok' }, rel(f.due));
+      fline = h('div', { class: 'line' }, 'متابعة كل ' + daysWord(Number(c.followEvery)) + ' · آخر تواصل: ', h('b', null, c.lastContact ? rel(c.lastContact) : 'مش متسجل'), ' · الجاية: ', st);
+    }
+    var card = h('div', { class: 'card' },
+      h('div', { class: 'ch' }, h('span', { class: 'sw', style: 'background:var(--' + (c.color || 'c8') + ')' }), h('b', null, c.name), h('span', { class: 'pill' }, KINDS[c.kind] || 'مشروع')),
+      (c.services || []).length ? h('div', { class: 'services' }, c.services.map(function (s) { return h('span', { class: 'pill' }, s); })) : null,
+      c.nextAction ? h('div', { class: 'line' }, 'الخطوة الجاية: ', h('b', null, c.nextAction)) : null,
+      fline,
+      c.notes ? h('div', { class: 'line' }, c.notes) : null);
+    if (open.length) {
+      var tl = h('div', { class: 'tasks' });
+      open.slice(0, 6).forEach(function (t) { tl.append(taskRow(t, { hideClient: true, showDue: true, noMove: true })); });
+      if (open.length > 6) tl.append(h('div', { class: 'line', style: 'padding:4px' }, '+ ' + (open.length - 6) + ' كمان'));
+      card.append(tl);
+    }
+    card.append(h('div', { class: 'foot' },
+      h('button', { class: 'btn small', type: 'button', onclick: function () { contacted(c); } }, 'اتواصلت النهارده'),
+      h('button', { class: 'btn small', type: 'button', onclick: function () { editTask({ client: c.id, due: TODAY, title: '' }, true); } }, '+ مهمة'),
+      h('button', { class: 'btn ghost small', type: 'button', onclick: function () { editClient(c); } }, 'تعديل')));
+    return card;
+  }
+
+  var dumpDraft = '';
+  function viewDump(root) {
+    root.append(h('div', { class: 'sec-head' }, h('h2', null, 'فضّي دماغك'), h('span', { class: 'sub' }, 'كل سطر = مهمة. لو كتبت اسم العميل في السطر هيتربط بيه لوحده')));
+    var ta = h('textarea', { class: 'dump', id: 'dump-text', placeholder: 'اكتب كل اللي في دماغك من غير ترتيب، مثلًا:\nتعديل بانر ناسا\nابعت فاتورة جرامافون\nبوست nilux عن الكشافات الجديدة\nاسأل زيزي على مشكلة الشحن' });
+    ta.value = dumpDraft;
+    ta.addEventListener('input', function () { dumpDraft = ta.value; });
+    root.append(ta, h('div', { style: 'display:flex;gap:8px;margin-top:8px;flex-wrap:wrap' },
+      h('button', { class: 'btn primary', type: 'button', onclick: function () {
+        var lines = ta.value.split('\n').map(function (s) { return s.replace(/^[\s\-•*\d.)]+/, '').trim(); }).filter(Boolean);
+        if (!lines.length) { ta.focus(); return; }
+        lines.forEach(function (l) { addTask({ title: l, client: detectClient(l), due: '', block: '', pri: false }); });
+        dumpDraft = ''; ta.value = '';
+        toast('اتضاف ' + lines.length + ' مهمة للصندوق تحت');
+      } }, 'حوّلهم لمهام')));
+
+    var inbox = S.tasks.filter(function (t) { return !t.done && !t.due; }).sort(function (a, b) { return String(b.created).localeCompare(String(a.created)); });
+    root.append(h('div', { class: 'sec-head' }, h('h2', null, 'الصندوق: مهام من غير ميعاد'), h('span', { class: 'sub' }, inbox.length ? 'حط لكل واحدة عميل وميعاد عشان تظهر في يومك' : '')));
+    if (!inbox.length) { root.append(h('div', { class: 'center-empty' }, 'الصندوق فاضي. أي حاجة تكتبها فوق هتنزل هنا.')); return; }
+    inbox.forEach(function (t) {
+      var cs = h('select', { class: 'field', 'aria-label': 'العميل', onchange: function () { patchTask(t, { client: this.value }); } }, h('option', { value: '' }, 'من غير عميل'));
+      activeClients().forEach(function (c) { cs.append(h('option', { value: c.id }, c.name)); });
+      cs.value = t.client || '';
+      var di = h('input', { class: 'field', type: 'date', 'aria-label': 'يوم معيّن', onchange: function () { if (this.value) { patchTask(t, { due: this.value }); toast('اتحطت ' + rel(this.value)); } } });
+      root.append(h('div', { class: 'inbox-row' },
+        h('div', { class: 't' }, t.title),
+        h('div', { class: 'ctl' }, cs,
+          h('button', { class: 'btn small', type: 'button', onclick: function () { patchTask(t, { due: TODAY }); toast('اتحطت النهارده'); } }, 'النهارده'),
+          h('button', { class: 'btn small', type: 'button', onclick: function () { patchTask(t, { due: addDays(TODAY, 1) }); toast('اتحطت بكرة'); } }, 'بكرة'),
+          di,
+          h('button', { class: 'btn ghost small danger', type: 'button', onclick: function () { editTask(t); } }, 'تعديل'))));
+    });
+  }
+
+  var planDraft = null; // unsaved schedule edits survive re-renders until saved or the view changes
+  function viewPlan(root) {
+    var sch = planDraft || (planDraft = JSON.parse(JSON.stringify(schedule())));
+    root.append(h('div', { class: 'sec-head' }, h('h2', null, 'بلوكات اليوم'), h('span', { class: 'sub' }, 'غيّر المواعيد والأسامي براحتك ودوس حفظ')));
+    var rowsBox = h('div');
+    function drawRows() {
+      rowsBox.replaceChildren();
+      sch.blocks.forEach(function (b, i) {
+        rowsBox.append(h('div', { class: 'sched-row' },
+          h('input', { class: 'field', type: 'time', value: b.start, 'aria-label': 'من', oninput: function () { b.start = this.value; } }),
+          h('input', { class: 'field', type: 'time', value: b.end, 'aria-label': 'لحد', oninput: function () { b.end = this.value; } }),
+          h('input', { class: 'field wide', type: 'text', value: b.label, 'aria-label': 'اسم البلوك', oninput: function () { b.label = this.value; } }),
+          h('input', { class: 'field wide', type: 'text', value: b.hint || '', placeholder: 'تعمل فيه إيه', 'aria-label': 'وصف', oninput: function () { b.hint = this.value; } }),
+          h('button', { class: 'btn ghost small danger', type: 'button', onclick: function () { sch.blocks.splice(i, 1); drawRows(); } }, 'شيل')));
+      });
+    }
+    drawRows();
+    var offBox = h('div', { class: 'daychips' });
+    function drawOff() {
+      offBox.replaceChildren();
+      WEEK_ORDER.forEach(function (d) {
+        var on = sch.offDays.indexOf(d) >= 0;
+        offBox.append(h('button', { class: 'daychip', type: 'button', 'aria-pressed': on ? 'true' : 'false', onclick: function () {
+          if (on) sch.offDays = sch.offDays.filter(function (x) { return x !== d; }); else sch.offDays.push(d); drawOff();
+        } }, DAYS[d]));
+      });
+    }
+    drawOff();
+    root.append(rowsBox,
+      h('div', { style: 'display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px' },
+        h('button', { class: 'btn small', type: 'button', onclick: function () { sch.blocks.push({ id: uid('b'), start: '18:00', end: '19:00', label: 'بلوك جديد', hint: '' }); drawRows(); } }, '+ بلوك'),
+        h('span', { class: 'muted', style: 'font-size:13px;margin-inline-start:8px' }, 'أيام الأجازة:'), offBox),
+      h('div', { style: 'margin-top:10px;display:flex;gap:8px;flex-wrap:wrap' },
+        h('button', { class: 'btn primary', type: 'button', onclick: function () {
+          var clean = { offDays: sch.offDays.slice(), blocks: sch.blocks.filter(function (b) { return b.start && b.end; }) };
+          planDraft = null;
+          save('settings/schedule', function (r) { return r.set(clean); }).then(function (ok) { if (ok) toast('الجدول اتحفظ'); });
+        } }, 'احفظ الجدول'),
+        h('button', { class: 'btn ghost small', type: 'button', onclick: function () { planDraft = null; render(); } }, 'الغي التغييرات')));
+
+    root.append(h('div', { class: 'sec-head' }, h('h2', null, 'الروتين المتكرر'), h('span', { class: 'sub' }, 'حاجات بتتعمل كل أسبوع في نفس الأيام. بتظهر في يومك لوحدها')));
+    var rlist = h('div');
+    S.routines.slice().sort(function (a, b) { return (a.order || 0) - (b.order || 0); }).forEach(function (r) { rlist.append(routineEditor(r)); });
+    if (!S.routines.length) rlist.append(h('div', { class: 'empty-block' }, 'مفيش روتين لسه.'));
+    root.append(rlist, h('div', { style: 'margin-top:10px' }, h('button', { class: 'btn small', type: 'button', onclick: function () {
+      var maxOrder = S.routines.reduce(function (m, r) { return Math.max(m, r.order || 0); }, 0);
+      var body = { title: 'روتين جديد', client: '', days: [6, 0, 1, 2, 3, 4], block: blocks()[0] ? blocks()[0].id : '', order: maxOrder + 1 };
+      save('routines/' + uid('r'), function (ref) { return ref.set(body); });
+    } }, '+ روتين')));
+
+    // settings
+    root.append(h('div', { class: 'sec-head' }, h('h2', null, 'الإعدادات')));
+    var nameIn = h('input', { class: 'field', type: 'text', value: appName(), id: 'set-name', 'aria-label': 'اسم الصفحة', style: 'flex:1 1 180px' });
+    var syncText;
+    var st = Sync.state();
+    if (!Sync.enabled()) syncText = 'المزامنة مش متفعّلة. البيانات محفوظة في المتصفح ده بس، فاعمل نسخة احتياطية كل فترة.';
+    else if (st === 'login') syncText = 'المزامنة متفعّلة بس انت مش مسجّل دخول. سجّل من فوق.';
+    else if (st === 'error') syncText = 'المزامنة واقفة: ' + Sync.error();
+    else syncText = 'متزامن مع حسابك' + (Sync.email() ? ' (' + Sync.email() + ')' : '') + '. أي تعديل هنا بيوصل للموبايل واللابتوب.';
+    var confirmWipe = false;
+    root.append(h('div', { class: 'settings' },
+      h('div', { class: 'panel' }, h('h2', null, 'اسم الصفحة'),
+        h('div', { class: 'row' }, nameIn, h('button', { class: 'btn small', type: 'button', onclick: function () {
+          var v = nameIn.value.trim(); if (!v) return;
+          save('settings/app', function (r) { return r.set({ name: v }); }).then(function () { toast('الاسم اتغير'); });
+        } }, 'احفظ'))),
+      h('div', { class: 'panel' }, h('h2', null, 'المزامنة'), h('p', null, syncText),
+        Sync.enabled() && Sync.email() ? h('div', { class: 'row' },
+          h('button', { class: 'btn small', type: 'button', onclick: function () { Sync.pushNow().then(function () { toast('اتزامن'); }); } }, 'زامن دلوقتي'),
+          h('button', { class: 'btn ghost small', type: 'button', onclick: function () { Sync.signOut(); } }, 'خروج')) : null),
+      h('div', { class: 'panel' }, h('h2', null, 'البيانات'),
+        h('p', null, 'النسخة الاحتياطية ملف فيه كل حاجة. الاستيراد بيضيف اللي في الملف، ولو نفس الحاجة موجودة بياخد الأحدث.'),
+        h('div', { class: 'row' },
+          h('button', { class: 'btn small', type: 'button', onclick: exportData }, 'نزّل نسخة احتياطية'),
+          h('button', { class: 'btn small', type: 'button', onclick: importData }, 'استورد من ملف'),
+          h('button', { class: 'btn ghost small danger', type: 'button', onclick: function () {
+            if (!confirmWipe) { confirmWipe = true; this.textContent = 'متأكد؟ هيتمسح كل حاجة. دوس تاني'; return; }
+            Store.wipe(); toast('اتمسح كل حاجة'); confirmWipe = false;
+          } }, 'امسح كل البيانات')))));
+  }
+  function routineEditor(r) {
+    var draft = { title: r.title, client: r.client || '', days: (r.days || []).slice(), block: r.block || '' };
+    var chips = h('div', { class: 'daychips' });
+    function persist() {
+      var body = { title: draft.title, client: draft.client, days: draft.days.slice().sort(), block: draft.block, order: r.order || 0 };
+      save('routines/' + r.id, function (ref) { return ref.set(body); });
+    }
+    function drawChips() {
+      chips.replaceChildren();
+      WEEK_ORDER.forEach(function (d) {
+        var on = draft.days.indexOf(d) >= 0;
+        chips.append(h('button', { class: 'daychip', type: 'button', 'aria-pressed': on ? 'true' : 'false', onclick: function () {
+          if (on) draft.days = draft.days.filter(function (x) { return x !== d; }); else draft.days.push(d); drawChips(); persist();
+        } }, DAYS[d].replace('ال', '')));
+      });
+    }
+    drawChips();
+    var cs = h('select', { class: 'field', 'aria-label': 'العميل', onchange: function () { draft.client = this.value; persist(); } }, h('option', { value: '' }, 'من غير عميل'));
+    activeClients().forEach(function (c) { cs.append(h('option', { value: c.id }, c.name)); });
+    cs.value = draft.client;
+    var bs = h('select', { class: 'field', 'aria-label': 'البلوك', onchange: function () { draft.block = this.value; persist(); } });
+    blocks().forEach(function (b) { bs.append(h('option', { value: b.id }, b.start + ' ' + b.label)); });
+    bs.value = draft.block;
+    var ti = h('input', { class: 'field', type: 'text', value: draft.title, 'aria-label': 'الروتين', style: 'flex:1 1 220px', onchange: function () { draft.title = this.value.trim() || draft.title; persist(); } });
+    var confirmDel = false;
+    return h('div', { class: 'routine' }, ti, cs, bs, chips,
+      h('button', { class: 'btn ghost small danger', type: 'button', onclick: function () {
+        if (!confirmDel) { confirmDel = true; this.textContent = 'متأكد؟'; return; }
+        save('routines/' + r.id, function (ref) { return ref.delete(); });
+      } }, 'امسح'));
+  }
+
+  // ---------- modals ----------
+  function openModal(node) {
+    var o = $('overlay'); o.replaceChildren(node); o.hidden = false;
+    var f = node.querySelector('input,textarea,select'); if (f) f.focus();
+  }
+  function closeModal() { var o = $('overlay'); o.hidden = true; o.replaceChildren(); if (pending) { pending = false; render(); } }
+  $('overlay').addEventListener('click', function (e) { if (e.target === this) closeModal(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !$('overlay').hidden) closeModal(); });
+
+  function editTask(t, isNew) {
+    var title = h('input', { class: 'field', type: 'text', value: t.title || '', id: 'm-title' });
+    var cs = h('select', { class: 'field', id: 'm-client' }, h('option', { value: '' }, 'من غير عميل'));
+    activeClients().forEach(function (c) { cs.append(h('option', { value: c.id }, c.name)); }); cs.value = t.client || '';
+    var due = h('input', { class: 'field', type: 'date', value: t.due || '', id: 'm-due' });
+    var bs = h('select', { class: 'field', id: 'm-block' }, h('option', { value: '' }, 'أي وقت'));
+    blocks().forEach(function (b) { bs.append(h('option', { value: b.id }, b.start + ' ' + b.label)); }); bs.value = t.block || '';
+    var pri = h('input', { type: 'checkbox', id: 'm-pri', checked: !!t.pri });
+    var confirmDel = false;
+    var del = isNew ? null : h('button', { class: 'btn ghost danger', type: 'button', onclick: function () {
+      if (!confirmDel) { confirmDel = true; this.textContent = 'متأكد؟ دوس تاني'; return; }
+      deleteTask(t); closeModal(); toast('اتمسحت');
+    } }, 'امسح المهمة');
+    var form = h('form', { class: 'modal', onsubmit: function (e) {
+      e.preventDefault();
+      var v = { title: title.value.trim(), client: cs.value, due: due.value, block: bs.value, pri: pri.checked };
+      if (!v.title) { title.focus(); return; }
+      if (isNew) { addTask(v); toast('اتضافت'); } else patchTask(t, v);
+      closeModal();
+    } },
+      h('h2', null, isNew ? 'مهمة جديدة' : 'تعديل المهمة'),
+      h('label', null, 'المهمة', title),
+      h('div', { class: 'two' }, h('label', null, 'العميل', cs), h('label', null, 'اليوم (فاضي = الصندوق)', due)),
+      h('label', null, 'البلوك', bs),
+      h('label', { class: 'chk', style: 'flex-direction:row' }, pri, 'مهم'),
+      h('div', { class: 'acts' }, h('div', { style: 'display:flex;gap:8px' },
+        h('button', { class: 'btn primary', type: 'submit' }, 'احفظ'),
+        h('button', { class: 'btn', type: 'button', onclick: closeModal }, 'إلغاء')), del));
+    openModal(form);
+  }
+
+  function editClient(c) {
+    var isNew = !c;
+    c = c || { name: '', kind: 'project', services: [], keys: [], followEvery: 0, lastContact: '', nextAction: '', notes: '', color: COLORS[S.clients.length % COLORS.length] };
+    var name = h('input', { class: 'field', type: 'text', value: c.name, id: 'c-name' });
+    var kind = h('select', { class: 'field', id: 'c-kind' });
+    Object.keys(KINDS).forEach(function (k) { kind.append(h('option', { value: k }, KINDS[k])); }); kind.value = c.kind || 'project';
+    var services = h('input', { class: 'field', type: 'text', value: (c.services || []).join('، '), id: 'c-services', placeholder: 'سوشيال ميديا، إعلانات، Shopify' });
+    var keys = h('input', { class: 'field', type: 'text', value: (c.keys || []).join('، '), id: 'c-keys', placeholder: 'الأسامي اللي بتكتبه بيها' });
+    var every = h('input', { class: 'field', type: 'number', min: '0', max: '90', value: String(c.followEvery || 0), id: 'c-every' });
+    var last = h('input', { class: 'field', type: 'date', value: c.lastContact || '', id: 'c-last' });
+    var next = h('input', { class: 'field', type: 'text', value: c.nextAction || '', id: 'c-next', placeholder: 'هتكلمهم في إيه المرة الجاية' });
+    var notes = h('textarea', { class: 'field', id: 'c-notes' }); notes.value = c.notes || '';
+    var order = h('input', { class: 'field', type: 'number', min: '1', max: '999', value: String(c.order || S.clients.length + 1), id: 'c-order' });
+    var color = h('select', { class: 'field', id: 'c-color' });
+    COLORS.forEach(function (k, i) { color.append(h('option', { value: k }, 'لون ' + (i + 1))); }); color.value = c.color || 'c8';
+    var split = function (s) { return s.split(/[،,]/).map(function (x) { return x.trim(); }).filter(Boolean); };
+    var confirmArc = false;
+    var arc = isNew ? null : h('button', { class: 'btn ghost danger', type: 'button', onclick: function () {
+      if (!confirmArc) { confirmArc = true; this.textContent = 'متأكد؟ دوس تاني'; return; }
+      save('clients/' + c.id, function (r) { return r.update({ archived: true }); }); closeModal(); toast(c.name + ' اتقفل، تقدر ترجّعه من تحت صفحة العملاء');
+    } }, 'قفّل العميل');
+    var form = h('form', { class: 'modal', onsubmit: function (e) {
+      e.preventDefault();
+      var v = { name: name.value.trim(), kind: kind.value, services: split(services.value), keys: split(keys.value),
+        followEvery: Math.max(0, Number(every.value) || 0), lastContact: last.value, nextAction: next.value.trim(), notes: notes.value.trim(),
+        color: color.value, order: Number(order.value) || S.clients.length + 1, archived: false };
+      if (!v.name) { name.focus(); return; }
+      var id = c.id || uid('c');
+      save('clients/' + id, function (r) { return r.set(v); }).then(function (ok) { if (ok) toast('اتحفظ'); });
+      closeModal();
+    } },
+      h('h2', null, isNew ? 'عميل جديد' : 'تعديل ' + c.name),
+      h('div', { class: 'two' }, h('label', null, 'الاسم', name), h('label', null, 'النوع', kind)),
+      h('label', null, 'الخدمات (افصل بفاصلة)', services),
+      h('div', { class: 'two' }, h('label', null, 'تابع كل كام يوم (0 = لأ)', every), h('label', null, 'آخر تواصل', last)),
+      h('label', null, 'الخطوة الجاية', next),
+      h('label', null, 'ملاحظات', notes),
+      h('label', null, 'كلمات تتعرّف بيها في المهام (افصل بفاصلة)', keys),
+      h('div', { class: 'two' }, h('label', null, 'اللون', color), h('label', null, 'الترتيب', order)),
+      h('div', { class: 'acts' }, h('div', { style: 'display:flex;gap:8px' },
+        h('button', { class: 'btn primary', type: 'submit' }, 'احفظ'),
+        h('button', { class: 'btn', type: 'button', onclick: closeModal }, 'إلغاء')), arc));
+    openModal(form);
+  }
+
+  // ---------- render loop ----------
+  function view() {
+    var v = (location.hash || '').replace('#', '');
+    return VIEWS.some(function (x) { return x.id === v; }) ? v : 'today';
+  }
+  var pending = false, raf = 0;
+  function changed() { if (raf) return; raf = requestAnimationFrame(function () { raf = 0; render(); }); }
+  function render() {
+    renderHeader();
+    var root = $('view');
+    var a = document.activeElement;
+    if ((a && root.contains(a) && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)) || !$('overlay').hidden) { pending = true; return; }
+    pending = false;
+    var y = window.scrollY;
+    root.replaceChildren();
+    var v = view();
+    $('capture').hidden = v === 'plan';
+    if (v === 'today') viewToday(root);
+    else if (v === 'week') viewWeek(root);
+    else if (v === 'clients') viewClients(root);
+    else if (v === 'dump') viewDump(root);
+    else viewPlan(root);
+    window.scrollTo(0, y);
+  }
+  $('view').addEventListener('focusout', function () { setTimeout(function () { if (pending) render(); }, 0); });
+  window.addEventListener('hashchange', function () { pending = false; planDraft = null; window.scrollTo(0, 0); var a = document.activeElement; if (a && a.blur) a.blur(); render(); });
+  // another tab of the desk changed the data: take its newer docs (no reload, so two tabs can't ping-pong)
+  window.addEventListener('storage', function (e) {
+    if (e.key !== STORE_KEY || !e.newValue) return;
+    try { Store.mergeIn(JSON.parse(e.newValue)); } catch (x) { /* ignore a half-written value */ }
+  });
+  setInterval(function () {
+    var t = ymd(new Date());
+    if (t !== TODAY) { TODAY = t; subDay(); }
+    if (view() === 'plan') renderHeader(); else changed();
+  }, 60000);
+
+  fillSelects();
+  start();
+  render();
+})();
+</script>
+</body>
+</html>
